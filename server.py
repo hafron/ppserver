@@ -3,8 +3,9 @@ from ezodf import opendoc
 import json
 import datetime
 
-def calc_time_to_object(time):
-    return datetime.time(int(time[2:4]), int(time[5:7]), int(time[8:10]))
+def calc_time_to_unix(time):
+    tt = datetime.time(int(time[2:4]), int(time[5:7]), int(time[8:10]))
+    return tt.hour * 3600 + tt.minute * 60 + tt.second
 
 arkusz = "/home/hafron/dev/pomodoro_planner/plan_tygodnia.ods"
 
@@ -13,12 +14,11 @@ sheets = ods.sheets
 plan = sheets['Plan']
 conf = sheets['Konfiguracja']
 export_data = {'config': {
-			 'pomodoro_length': str(calc_time_to_object(conf['D6'].value)),
-			 'short_break_length': str(calc_time_to_object(conf['D7'].value)),
-			 'long_break_length': str(calc_time_to_object(conf['D9'].value)),
+			 'pomodoro_length': calc_time_to_unix(conf['D6'].value),
+			 'short_break_length': calc_time_to_unix(conf['D7'].value),
+			 'long_break_length': calc_time_to_unix(conf['D9'].value),
 			 }, 'pomodoros':{}}
-week_days = ['pon', 'wt', 'sr', 'czw', 'pt', 'sb', 'nd']
-
+week_days = ['pn', 'wt', 'sr', 'czw', 'pt', 'sb', 'nd']
 
 i=2
 k=0
@@ -53,4 +53,4 @@ def index(action):
     if action == 'sync':
        return json.dumps(export_data)
 
-run(host='localhost', port=8080)
+run(host='192.168.90.56', port=8080)
